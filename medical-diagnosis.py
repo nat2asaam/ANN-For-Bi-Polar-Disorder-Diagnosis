@@ -10,8 +10,14 @@
 # Engaging in risky activities
 import numpy as np
 import activation_utility as act
-X=np.array([[0.0,0.0,0.0,0.0,0.0,0.0,0.0],[1.0,0.0,0.0,0.0,0.0,0.0,0.0],[0.0,1.0,0.0,0.0,0.0,0.0,0.0],[0.0,0.0,1.0,0.0,0.0,0.0,0.0],[0.0,0.0,0.0,1.0,0.0,0.0,0.0],[0.0,0.0,0.0,0.0,1.0,0.0,0.0],[0.0,0.0,0.0,0.0,0.0,1.0,0.0],[1.0,1.0,0.0,0.0,0.0,0.0,1.0],[1.0,1.0,1.0,0.0,0.0,0.0,0.0],[1.0,1.0,1.0,1.0,0.0,0.0,0.0],[1.0,1.0,1.0,1.0,1.0,0.0,0.0],[1.0,1.0,1.0,1.0,1.0,1.0,0.0],[1.0,1.0,1.0,1.0,1.0,1.0,1.0]]).T
-d=np.array([[0.000,0.143,0.143,0.143,0.143,0.143,0.143,0.286,0.429,0.571,0.714,0.857,1.000]])
+# X=np.array([[0.0,0.0,0.0,0.0,0.0,0.0,0.0],[1.0,0.0,0.0,0.0,0.0,0.0,0.0],[0.0,1.0,0.0,0.0,0.0,0.0,0.0],[0.0,0.0,1.0,0.0,0.0,0.0,0.0],[0.0,0.0,0.0,1.0,0.0,0.0,0.0],[0.0,0.0,0.0,0.0,1.0,0.0,0.0],[0.0,0.0,0.0,0.0,0.0,1.0,0.0],[1.0,1.0,0.0,0.0,0.0,0.0,1.0],[1.0,1.0,1.0,0.0,0.0,0.0,0.0],[1.0,1.0,1.0,1.0,0.0,0.0,0.0],[1.0,1.0,1.0,1.0,1.0,0.0,0.0],[1.0,1.0,1.0,1.0,1.0,1.0,0.0],[1.0,1.0,1.0,1.0,1.0,1.0,1.0]]).T
+# d=np.array([[0.000,0.143,0.143,0.143,0.143,0.143,0.143,0.286,0.429,0.571,0.714,0.857,1.000]])
+# Generate the input dataset
+X=np.indices((2,)*7).reshape(7,-1).T
+X=X.astype(np.float32)
+# Generate the target dataset
+d=np.mean(X, axis=1)
+d=d.reshape(1,-1)
 def initialize_network_parameters():
     inputSize=7 # number of input neurons
     hiddenSize=3 # number of hidden neurons
@@ -28,7 +34,7 @@ error_list = []
 # train the network
 for epoch in range(epochs):
     # forward pass
-    z1=np.dot(w1,X)+b1 # weighted sum for hidden layer
+    z1=np.dot(w1,X.T)+b1 # weighted sum for hidden layer
     # a1=1.0/(1.0+np.exp(-z1)) # sigmoid activation for hidden layer
     a1 = act.relu(z1)  # ReLU activation for hidden layer
     z2=np.dot(w2,a1)+b2 # weighted sum for output layer
@@ -47,7 +53,7 @@ for epoch in range(epochs):
     # update weights and biases
     w2+=lr*np.dot(dz2,a1.T) # update weights for hidden to output layer
     b2+=lr*np.sum(dz2,axis=1,keepdims=True)# update bias for output layer
-    w1+=lr*np.dot(dz1,X.T) # update weights for input to hidden layer
+    w1+=lr*np.dot(dz1,X) # update weights for input to hidden layer
     b1+=lr*np.sum(dz1,axis=1,keepdims=True) # update bias for hidden layer
     if (epoch + 1) % 10000 == 0:
         print("Epoch: %d, Average Error: %0.05f" % (epoch + 1, np.average(np.abs(error))))
@@ -56,7 +62,7 @@ for epoch in range(epochs):
             # Plot ReLU and sigmoid activation functions and their derivatives
             act.graph_activation_and_derivative(z1,act.relu(z1),act.relu_derivative(z1),"ReLU Activation","ReLU Derivative","ReLU Activation and Derrivative",act.sigmoid(z1),act.sigmoid_derivative(z1),"Sigmoid Activation","Sigmoid Derivative","Sigmoid Activation and Derivative")
  # Testing the trained network
-z1 = np.dot(w1, X) + b1  # Weighted sum for hidden layer
+z1 = np.dot(w1, X.T) + b1  # Weighted sum for hidden layer
 # a1 = 1 / (1 + np.exp(-z1))  # Sigmoid activation for hidden layer
 a1 = act.relu(z1)  # relu activation for hidden layer
 
